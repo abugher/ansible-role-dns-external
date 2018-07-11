@@ -1,0 +1,2 @@
+# m     h       dom     mon     dow     user    command
+*       *       *       *       *       root    /usr/local/bin/dns_root_agent_cronjob

@@ -1,0 +1,47 @@
+#!/bin/bash
+
+read neuronpointer_ip < /etc/neuronpointer.net
+
+ip_regex='^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$'
+
+fail() {
+  echo "Error:  ${2}" >&2
+  exit $1
+}
+
+err_invalid=1
+err_append=2
+err_sed_hosts=3
+err_service_reload=4
+err_sed_conf=5
+err_service_restart=6
+
+if ! echo $neuronpointer_ip | grep -qE $ip_regex; then
+  fail $err_invalid "Invalid IP address:  ${neuronpointer_ip}"
+fi
+
+if ! grep -qF ' neuronpointer.net' /etc/hosts; then
+  echo ' neuronpointer.net' >> /etc/hosts \
+  || fail $err_append 'Failed to append a line to /etc/hosts.'
+fi
+
+# The list of externally visible subdomains should come from ansible
+# inventory, instead of being written explicitly here, in code.
+line="${neuronpointer_ip}"' neuronpointer\.net remote\.neuronpointer\.net nagios\.neuronpointer\.net'
+if ! grep -qF "${line} neuronpointer.net" /etc/hosts; then
+  sed -i -E \
+    's/.* neuronpointer\.net.*$/'"${line}"'/' \
+    /etc/hosts \
+  || fail $err_sed_hosts "sed failed:  ${?}"
+  service dnsmasq force-reload \
+  || fail $err_service_reload "service reload failed:  ${?}"
+fi
+
+#if ! grep -qF "address=/.neuronpointer.net/neuronpointer.net/${neuronpointer_ip}" /etc/dnsmasq.conf; then
+#  sed -i -E \
+#    's/^address=\/.neuronpointer\.net\/neuronpointer\.net\/[0-9.]*$/address=\/.neuronpointer.net\/neuronpointer.net\/'$neuronpointer_ip'/' \
+#    /etc/dnsmasq.conf \
+#  || fail $err_sed_conf "sed failed:  ${?}"
+#  service dnsmasq restart \
+#  || fail $err_service_restart "service restart failed:  ${?}"
+#fi

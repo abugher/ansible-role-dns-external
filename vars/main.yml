@@ -1,0 +1,52 @@
+---
+install_packages:
+  - 'dnsmasq'
+install_files:
+  - owner:              'root'
+    group:              'root'
+    mode:               '0644'
+    src:                "{{ role_path }}/files/conf/dnsmasq.conf"
+    dest:               '/etc/dnsmasq.conf'
+  # Just don't install a hosts file.  There's no static list of hostnames to
+  # install, and the file should be updated automatically within about ten
+  # minutes, if that's even necessary.  If we're feeling fancy later, we can
+  # try to make update_dns_phase1 run on synapse in order to ensure the file
+  # is initialized.
+  - owner:              'root'
+    group:              'root'
+    mode:               '0644'
+    src:                "{{ role_path }}/files/conf/default.dnsmasq"
+    dest:               '/etc/default/dnsmasq'
+  - owner:              'root'
+    group:              'root'
+    mode:               '0755'
+    src:                "{{ role_path }}/files/bin/dns_root_agent_cronjob"
+    dest:               '/usr/local/bin/dns_root_agent_cronjob'
+  - owner:              'root'
+    group:              'root'
+    mode:               '0755'
+    src:                "{{ role_path }}/files/bin/dns_root_agent"
+    dest:               '/usr/local/bin/dns_root_agent'
+  - owner:              'root'
+    group:              'root'
+    mode:               '0755'
+    src:                "{{ role_path }}/files/cron.d/dns_root_agent"
+    dest:               '/etc/cron.d/dns_root_agent'
+initialize_files:
+  - owner:              'neuronpointer'
+    group:              'root'
+    mode:               '0644'
+    dest:               '/etc/neuronpointer.net'
+system_groups:
+  - 'neuronpointer'
+system_users:
+  - 'neuronpointer'
+authorized_keys:
+  - user:               'neuronpointer'
+    keyfile:            "{{ role_path }}/../neuron/files/ssh_keys/pi.id_rsa.pub"
+enable_services:
+  - 'dnsmasq'
+start_services:
+  - 'dnsmasq'
+restart_services:
+  - 'dnsmasq'

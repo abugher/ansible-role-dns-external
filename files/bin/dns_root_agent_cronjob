@@ -1,0 +1,6 @@
+#!/bin/bash
+
+# DISTRIBUTED BY ANSIBLE
+
+/usr/local/bin/dns_root_agent > /var/log/dns_root_agent.log 2>&1
+echo $? > /var/log/dns_root_agent.ret
