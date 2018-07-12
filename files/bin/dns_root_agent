@@ -33,7 +33,7 @@ if ! grep -qF "${line} neuronpointer.net" /etc/hosts; then
     's/.* neuronpointer\.net.*$/'"${line}"'/' \
     /etc/hosts \
   || fail $err_sed_hosts "sed failed:  ${?}"
-  service dnsmasq force-reload \
+  /usr/sbin/service dnsmasq force-reload \
   || fail $err_service_reload "service reload failed:  ${?}"
 fi
 
