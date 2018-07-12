@@ -27,7 +27,7 @@ fi
 
 # The list of externally visible subdomains should come from ansible
 # inventory, instead of being written explicitly here, in code.
-line="${neuronpointer_ip}"' neuronpointer\.net remote\.neuronpointer\.net nagios\.neuronpointer\.net'
+line="${neuronpointer_ip}"' neuronpointer\.net remote\.neuronpointer\.net nagios\.neuronpointer\.net public\.neuronpointer\.net'
 if ! grep -qF "${line} neuronpointer.net" /etc/hosts; then
   sed -i -E \
     's/.* neuronpointer\.net.*$/'"${line}"'/' \
