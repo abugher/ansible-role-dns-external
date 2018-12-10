@@ -45,7 +45,7 @@ system_users:
   - 'neuronpointer'
 authorized_keys:
   - user:               'neuronpointer'
-    keyfile:            "{{ role_path }}/../neuron/files/ssh_keys/pi.id_rsa.pub"
+    keyfile:            "{{ role_path }}/../../inventory/hosts/neuron/users/pi/files/ssh_keys/id_rsa.pub"
 enable_services:
   - 'dnsmasq'
 start_services:
