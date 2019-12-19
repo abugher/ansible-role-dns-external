@@ -6,7 +6,6 @@
 - include:              '../tasks/install_packages.yml'
 - include:              '../tasks/remove_packages.yml'
 - include:              '../tasks/install_files.yml'
-- include:              '../tasks/initialize_files.yml'
 - include:              '../tasks/enable_services.yml'
 - include:              '../tasks/start_services.yml'
 - include:              '../tasks/restart_services.yml'

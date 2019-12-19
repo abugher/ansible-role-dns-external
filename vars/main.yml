@@ -34,11 +34,12 @@ install_files:
     mode:               '0755'
     src:                "{{ role_path }}/files/cron.d/dns_root_agent"
     dest:               '/etc/cron.d/dns_root_agent'
-initialize_files:
+create_files:
   - owner:              'neuronpointer'
     group:              'root'
     mode:               '0644'
-    dest:               '/etc/neuronpointer.net'
+    state:              'touch'
+    path:               '/etc/neuronpointer.net'
 system_groups:
   - 'neuronpointer'
 system_users:
