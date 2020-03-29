@@ -7,7 +7,7 @@ install_files:
   - owner:              'root'
     group:              'root'
     mode:               '0644'
-    src:                'files/conf/dnsmasq.conf'
+    src:                "{{ role_path }}/files/conf/dnsmasq.conf"
     dest:               '/etc/dnsmasq.conf'
   # Just don't install a hosts file.  There's no static list of hostnames to
   # install, and the file should be updated automatically within about ten
@@ -17,22 +17,22 @@ install_files:
   - owner:              'root'
     group:              'root'
     mode:               '0644'
-    src:                'files/conf/default.dnsmasq'
+    src:                "{{ role_path }}/files/conf/default.dnsmasq"
     dest:               '/etc/default/dnsmasq'
   - owner:              'root'
     group:              'root'
     mode:               '0755'
-    src:                'files/bin/dns_root_agent_cronjob'
+    src:                "{{ role_path }}/files/bin/dns_root_agent_cronjob"
     dest:               '/usr/local/bin/dns_root_agent_cronjob'
   - owner:              'root'
     group:              'root'
     mode:               '0755'
-    src:                'files/bin/dns_root_agent'
+    src:                "{{ role_path }}/files/bin/dns_root_agent"
     dest:               '/usr/local/bin/dns_root_agent'
   - owner:              'root'
     group:              'root'
     mode:               '0755'
-    src:                'files/cron.d/dns_root_agent'
+    src:                "{{ role_path }}/files/cron.d/dns_root_agent"
     dest:               '/etc/cron.d/dns_root_agent'
 create_files:
   - owner:              'neuronpointer'
@@ -46,7 +46,7 @@ system_users:
   - 'neuronpointer'
 authorized_keys:
   - user:               'neuronpointer'
-    keyfile:            '../../inventory/hosts/neuron/users/pi/files/ssh_keys/id_rsa.pub'
+    keyfile:            "{{ role_path }}/../../inventory/hosts/neuron/users/pi/files/ssh_keys/id_rsa.pub"
 allow_users:
   - 'neuronpointer'
 enable_services:
@@ -55,3 +55,8 @@ start_services:
   - 'dnsmasq'
 restart_services:
   - 'dnsmasq'
+commands:
+  - command:            /usr/local/bin/dns_root_agent
+    user:               root
+    chdir:              /
+    creates:            /nothing

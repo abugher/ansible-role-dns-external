@@ -24,3 +24,13 @@ if ! grep -qF ' neuronpointer.net' /etc/hosts; then
   echo ' neuronpointer.net' >> /etc/hosts \
   || fail $err_append 'Failed to append a line to /etc/hosts.'
 fi
+
+line="${neuronpointer_ip}"' neuronpointer\.net'
+if ! grep -qF "^${line}$" /etc/hosts; then
+  sed -i -E \
+    's/.* neuronpointer\.net.*$/'"${line}"'/' \
+    /etc/hosts \
+  || fail $err_sed_hosts "sed failed:  ${?}"
+  /usr/sbin/service dnsmasq force-reload \
+  || fail $err_service_reload "service reload failed:  ${?}"
+fi

@@ -10,3 +10,5 @@
 - include:              '../tasks/start_services.yml'
 - include:              '../tasks/restart_services.yml'
   when:                 install_files_result.changed
+- include:              '../tasks/commands.yml'
+  changed_when:         false
