@@ -1,0 +1,13 @@
+domain-needed
+bogus-priv
+interface=eth0
+no-dhcp-interface=eth0
+cname=*.{{ domain }},{{ domain }}
+{% for mail_server in groups['mail_server'] %}
+mx-host={{ domain }},{{ mail_server }}.{{ domain }},10
+mx-host={{ mail_server }}.{{ domain }},{{ mail_server }}.{{ domain }},10
+{% endfor %}
+auth-server={{ inventory_hostname }}.{{ domain }},eth0
+auth-zone={{ domain }}
+auth-soa=1
+txt-record={{ domain }},v=spf1 mx -all
