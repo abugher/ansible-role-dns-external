@@ -12,4 +12,4 @@ auth-zone={{ domain }}
 auth-soa=1
 txt-record={{ domain }},v=spf1 mx -all
 txt-record={{ domain }},google-site-verification=YgVdDXBG8fHI6HMjO0y1DhwHsMDycBzCvfNE7QyClGA
-txt-record=mail._domainkeys.{{ domain }},v=DKIM1; k=rsa; p={{ dkim_public_key }}
+txt-record=mail._domainkey.{{ domain }},v=DKIM1; k=rsa; p={{ dkim_public_key }}

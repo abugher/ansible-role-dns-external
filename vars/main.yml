@@ -1,6 +1,7 @@
 ---
 install_packages:
   - 'dnsmasq'
+# https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=860064
 remove_packages:
   - 'dns-root-data'
 install_files:
