@@ -23,14 +23,14 @@ install_files:
   - owner:              'root'
     group:              'root'
     mode:               '0755'
-    src:                "files/bin/dns_root_agent"
-    dest:               '/usr/local/bin/dns_root_agent'
-  - owner:              'root'
-    group:              'root'
-    mode:               '0755'
     src:                "files/cron.d/dns_root_agent"
     dest:               '/etc/cron.d/dns_root_agent'
 template_files:
+  - owner:              'root'
+    group:              'root'
+    mode:               '0755'
+    src:                "templates/bin/dns_root_agent.j2"
+    dest:               '/usr/local/bin/dns_root_agent'
   - owner:              'root'
     group:              'root'
     mode:               '0644'
