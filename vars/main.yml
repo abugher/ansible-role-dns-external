@@ -41,7 +41,7 @@ create_files:
     group:              'root'
     mode:               '0644'
     state:              'touch'
-    path:               '/etc/neuronpointer.net'
+    path:               '/etc/neuron.neuronpointer.net'
 system_groups:
   - 'neuronpointer'
 system_users:
@@ -57,8 +57,8 @@ start_services:
   - 'dnsmasq'
 restart_services:
   - 'dnsmasq'
-commands:
-  - command:            /usr/local/bin/dns_root_agent
-    user:               root
-    chdir:              /
-    creates:            /nothing
+#commands:
+#  - command:            /usr/local/bin/dns_root_agent
+#    user:               root
+#    chdir:              /
+#    creates:            /nothing

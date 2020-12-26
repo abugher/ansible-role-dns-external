@@ -2,9 +2,12 @@ domain-needed
 bogus-priv
 interface=eth0
 no-dhcp-interface=eth0
-cname=*.{{ domain }},{{ domain }}
+cname=*.{{ domain }},neuron.{{ domain }}
+# Why doesn't this line have any effect?
+cname={{ domain }},{{ groups['mail_server'][0] }}.{{ domain }}
 {% for mail_server in groups['mail_server'] %}
 mx-host={{ domain }},{{ mail_server }}.{{ domain }},10
+mx-host=neuron.{{ domain }},{{ mail_server }}.{{ domain }},10
 mx-host={{ mail_server }}.{{ domain }},{{ mail_server }}.{{ domain }},10
 {% endfor %}
 auth-server={{ inventory_hostname }}.{{ domain }},eth0
