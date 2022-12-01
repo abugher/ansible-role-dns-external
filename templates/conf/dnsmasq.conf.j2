@@ -3,8 +3,6 @@ bogus-priv
 interface=eth0
 no-dhcp-interface=eth0
 cname=*.{{ domain }},{{ groups['dmz'][0] }}.{{ domain }}
-# Why doesn't this line have any effect?
-cname={{ domain }},{{ groups['mail_server'][0] }}.{{ domain }}
 {% for mail_server in groups['mail_server'] %}
 mx-host={{ domain }},{{ mail_server }}.{{ domain }},10
 mx-host={{ groups['dmz'][0] }}.{{ domain }},{{ mail_server }}.{{ domain }},10
