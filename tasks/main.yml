@@ -6,7 +6,6 @@
 - include:              '../tasks/allow_users.yml'
 - include:              '../tasks/install_packages.yml'
 # https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=860064
-- include:              '../tasks/remove_packages.yml'
 - include:              '../tasks/install_files.yml'
 - include:              '../tasks/template_files.yml'
 - include:              '../tasks/create_files.yml'
