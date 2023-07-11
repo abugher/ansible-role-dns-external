@@ -1,5 +1,5 @@
 ---
-- include_vars:         '../roles/mail_server/vars/dkim_public_key.yml'
+- include_vars:         '../roles/mail-server/vars/dkim_public_key.yml'
 - include:              '../tasks/system_groups.yml'
 - include:              '../tasks/system_users.yml'
 - include:              '../tasks/authorized_keys.yml'
