@@ -20,18 +20,36 @@ if ! echo $external_ip | grep -qE $ip_regex; then
   fail $err_invalid "Invalid IP address:  ${external_ip}"
 fi
 
+if ! grep -qF ' {{ domain }}' /etc/hosts; then
+  echo ' {{ domain }}' >> /etc/hosts \
+  || fail $err_append 'Failed to append a line (1) to /etc/hosts.'
+fi
+
 if ! grep -qF ' {{ groups['dmz'][0] }}.{{ domain }}' /etc/hosts; then
   echo ' {{ groups['dmz'][0] }}.{{ domain }}' >> /etc/hosts \
-  || fail $err_append 'Failed to append a line to /etc/hosts.'
+  || fail $err_append 'Failed to append a line (2) to /etc/hosts.'
+fi
+
+line="${external_ip}"' {{ domain }}'
+if ! grep -qF "^${line}$" /etc/hosts; then
+  pattern="$(
+    sed 's/\./\\./g' <<< ' {{ domain }}'
+  )"
+  sed -i -E \
+    's/.*'"${pattern}"'.*$/'"${line}"'/' \
+    /etc/hosts \
+  || fail $err_sed_hosts "sed failed:  ${?}"
+  /usr/sbin/service dnsmasq force-reload \
+  || fail $err_service_reload "service reload failed:  ${?}"
 fi
 
 line="${external_ip}"' {{ groups['dmz'][0] }}.{{ domain }}'
 if ! grep -qF "^${line}$" /etc/hosts; then
   pattern="$(
-    sed 's/\./\\./g' <<< '{{ groups['dmz'][0] }}.{{ domain }}'
+    sed 's/\./\\./g' <<< ' {{ groups['dmz'][0] }}.{{ domain }}'
   )"
   sed -i -E \
-    's/.* '"${pattern}"'.*$/'"${line}"'/' \
+    's/.*'"${pattern}"'.*$/'"${line}"'/' \
     /etc/hosts \
   || fail $err_sed_hosts "sed failed:  ${?}"
   /usr/sbin/service dnsmasq force-reload \
