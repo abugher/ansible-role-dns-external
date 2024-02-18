@@ -30,6 +30,11 @@ if ! grep -qF ' {{ groups['dmz'][0] }}.{{ domain }}' /etc/hosts; then
   || fail $err_append 'Failed to append a line (2) to /etc/hosts.'
 fi
 
+if ! grep -qF ' remote.{{ domain }}' /etc/hosts; then
+  echo ' remote.{{ domain }}' >> /etc/hosts \
+  || fail $err_append 'Failed to append a line (2) to /etc/hosts.'
+fi
+
 line="${external_ip}"' {{ domain }}'
 if ! grep -qF "^${line}$" /etc/hosts; then
   pattern="$(
@@ -55,3 +60,19 @@ if ! grep -qF "^${line}$" /etc/hosts; then
   /usr/sbin/service dnsmasq force-reload \
   || fail $err_service_reload "service reload failed:  ${?}"
 fi
+
+
+{% for h in groups['remote'] %}
+line="{{ hostvars[h]['ip_address'] }}"' remote.{{ domain }}'
+if ! grep -qF "^${line}$" /etc/hosts; then
+  pattern="$(
+    sed 's/\./\\./g' <<< ' remote.{{ domain }}'
+  )"
+  sed -i -E \
+    's/.*'"${pattern}"'.*$/'"${line}"'/' \
+    /etc/hosts \
+  || fail $err_sed_hosts "sed failed:  ${?}"
+  /usr/sbin/service dnsmasq force-reload \
+  || fail $err_service_reload "service reload failed:  ${?}"
+fi
+{% endfor %}
