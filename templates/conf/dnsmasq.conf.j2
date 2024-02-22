@@ -15,13 +15,6 @@ mx-host={{ domain }},{{ mail_server }}.{{ domain }},10
 mx-host={{ groups['dmz'][0] }}.{{ domain }},{{ mail_server }}.{{ domain }},10
 mx-host={{ mail_server }}.{{ domain }},{{ mail_server }}.{{ domain }},10
 {% endfor %}
-{% for alias in domain_aliases %}
-cname=*.{{ alias }},{{ alias }}
-{% for mail_server in groups['mail-server'] %}
-mx-host={{ alias }},{{ mail_server }}.{{ domain }},10
-mx-host={{ groups['dmz'][0] }}.{{ alias }},{{ mail_server }}.{{ domain }},10
-{% endfor %}
-{% endfor %}
 txt-record={{ domain }},v=spf1 mx -all
 txt-record={{ domain }},google-site-verification=YgVdDXBG8fHI6HMjO0y1DhwHsMDycBzCvfNE7QyClGA
 txt-record=mail._domainkey.{{ domain }},"v=DKIM1; k=rsa; ","p={{ dkim_public_key }}"
@@ -30,4 +23,13 @@ txt-record=_dmarc.{{ domain }},v=DMARC1; p=quarantine;
 txt-record={{mail_server}}.{{ domain }},v=spf1 mx -all
 txt-record=mail._domainkey.{{ mail_server }}.{{ domain }},"v=DKIM1; k=rsa; g=*;","p={{ dkim_public_key }}"
 txt-record=_dmarc.{{ mail_server }}.{{ domain }},v=DMARC1; p=quarantine;
+{% endfor %}
+{% for alias in domain_aliases %}
+cname=*.{{ alias }},{{ alias }}
+{% for mail_server in groups['mail-server'] %}
+mx-host={{ alias }},{{ mail_server }}.{{ domain }},10
+{% endfor %}
+txt-record={{ alias }},v=spf1 mx -all
+txt-record={{ dkim_selector }}._domainkey.{{ alias }},"v=DKIM1; k=rsa; ","p={{ dkim_public_key }}"
+txt-record=_dmarc.{{ alias }},v=DMARC1; p=quarantine;
 {% endfor %}

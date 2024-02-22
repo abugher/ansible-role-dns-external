@@ -1,4 +1,5 @@
 ---
+dkim_selector:          'mail'
 install_packages:
   - 'dnsmasq'
 # https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=860064
