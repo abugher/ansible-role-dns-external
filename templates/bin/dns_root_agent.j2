@@ -37,6 +37,9 @@ fi
 
 line="${external_ip}"' {{ domain }}'
 if ! grep -qF "^${line}$" /etc/hosts; then
+{% for domain_alias in domain_aliases %}
+  line="${line} {{ domain_alias }}"
+{% endfor %}
   pattern="$(
     sed 's/\./\\./g' <<< ' {{ domain }}'
   )"
@@ -60,7 +63,6 @@ if ! grep -qF "^${line}$" /etc/hosts; then
   /usr/sbin/service dnsmasq force-reload \
   || fail $err_service_reload "service reload failed:  ${?}"
 fi
-
 
 {% for h in groups['remote'] %}
 line="{{ hostvars[h]['ip_address'] }}"' remote.{{ domain }}'

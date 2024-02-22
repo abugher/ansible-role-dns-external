@@ -1,16 +1,27 @@
+{# log-queries=extra #}
 domain-needed
 bogus-priv
 interface=eth0
 no-dhcp-interface=eth0
+auth-server={{ inventory_hostname }}.{{ domain }},eth0
+auth-zone={{ domain }}
+{% for alias in domain_aliases %}
+auth-zone={{ alias }}
+{% endfor %}
+auth-soa=1
 cname=*.{{ domain }},{{ domain }}
 {% for mail_server in groups['mail-server'] %}
 mx-host={{ domain }},{{ mail_server }}.{{ domain }},10
 mx-host={{ groups['dmz'][0] }}.{{ domain }},{{ mail_server }}.{{ domain }},10
 mx-host={{ mail_server }}.{{ domain }},{{ mail_server }}.{{ domain }},10
 {% endfor %}
-auth-server={{ inventory_hostname }}.{{ domain }},eth0
-auth-zone={{ domain }}
-auth-soa=1
+{% for alias in domain_aliases %}
+cname=*.{{ alias }},{{ alias }}
+{% for mail_server in groups['mail-server'] %}
+mx-host={{ alias }},{{ mail_server }}.{{ domain }},10
+mx-host={{ groups['dmz'][0] }}.{{ alias }},{{ mail_server }}.{{ domain }},10
+{% endfor %}
+{% endfor %}
 txt-record={{ domain }},v=spf1 mx -all
 txt-record={{ domain }},google-site-verification=YgVdDXBG8fHI6HMjO0y1DhwHsMDycBzCvfNE7QyClGA
 txt-record=mail._domainkey.{{ domain }},"v=DKIM1; k=rsa; ","p={{ dkim_public_key }}"
