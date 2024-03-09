@@ -1,18 +1,18 @@
 ---
 - include_vars:         '../roles/mail-server/vars/dkim_public_key.yml'
-- include:              '../tasks/system_groups.yml'
-- include:              '../tasks/system_users.yml'
-- include:              '../tasks/authorized_keys.yml'
-- include:              '../tasks/allow_users.yml'
-- include:              '../tasks/install_packages.yml'
+- include_tasks:        '../tasks/system_groups.yml'
+- include_tasks:        '../tasks/system_users.yml'
+- include_tasks:        '../tasks/authorized_keys.yml'
+- include_tasks:        '../tasks/allow_users.yml'
+- include_tasks:        '../tasks/install_packages.yml'
 # https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=860064
-- include:              '../tasks/install_files.yml'
-- include:              '../tasks/template_files.yml'
-- include:              '../tasks/create_files.yml'
-- include:              '../tasks/enable_services.yml'
-- include:              '../tasks/start_services.yml'
-- include:              '../tasks/restart_services.yml'
+- include_tasks:        '../tasks/install_files.yml'
+- include_tasks:        '../tasks/template_files.yml'
+- include_tasks:        '../tasks/create_files.yml'
+- include_tasks:        '../tasks/enable_services.yml'
+- include_tasks:        '../tasks/start_services.yml'
+- include_tasks:        '../tasks/restart_services.yml'
   when:                 install_files_result.changed
                         or template_files_result.changed
-#- include:              '../tasks/commands.yml'
+#- include_tasks:        '../tasks/commands.yml'
 #  changed_when:         false
