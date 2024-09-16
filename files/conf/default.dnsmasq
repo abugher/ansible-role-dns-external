@@ -37,4 +37,3 @@ CONFIG_DIR=/etc/dnsmasq.d,.dpkg-dist,.dpkg-old,.dpkg-new
 # /etc/dnsmasq.conf is not enough to override resolvconf if it is
 # installed: the line below must be uncommented.
 #IGNORE_RESOLVCONF=yes
-
