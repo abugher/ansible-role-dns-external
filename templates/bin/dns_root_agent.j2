@@ -16,27 +16,24 @@ err_service_reload=4
 err_sed_conf=5
 err_service_restart=6
 
-if ! echo $external_ip | grep -qE $ip_regex; then
+reload='no'
+
+if ! grep -qE $ip_regex <<< $external_ip; then
   fail $err_invalid "Invalid IP address:  ${external_ip}"
 fi
 
+# fix domain 
 if ! grep -qF ' {{ domain }}' /etc/hosts; then
+  reload='yes'
   echo ' {{ domain }}' >> /etc/hosts \
-  || fail $err_append 'Failed to append a line (1) to /etc/hosts.'
+    || fail $err_append 'Failed to append a line for the domain to /etc/hosts.'
 fi
 
-if ! grep -qF ' {{ groups['dmz'][0] }}.{{ domain }}' /etc/hosts; then
-  echo ' {{ groups['dmz'][0] }}.{{ domain }}' >> /etc/hosts \
-  || fail $err_append 'Failed to append a line (2) to /etc/hosts.'
-fi
-
-if ! grep -qF ' remote.{{ domain }}' /etc/hosts; then
-  echo ' remote.{{ domain }}' >> /etc/hosts \
-  || fail $err_append 'Failed to append a line (2) to /etc/hosts.'
-fi
-
-line="${external_ip}"' {{ domain }}'
-if ! grep -qF "^${line}$" /etc/hosts; then
+line="$(
+  sed 's/\./\\./g' <<< "${external_ip}"' {{ domain }}'
+)"
+if ! grep -q "^${line}" /etc/hosts; then
+  reload='yes'
 {% for domain_alias in domain_aliases %}
   line="${line} {{ domain_alias }}"
 {% endfor %}
@@ -46,35 +43,56 @@ if ! grep -qF "^${line}$" /etc/hosts; then
   sed -i -E \
     's/.*'"${pattern}"'.*$/'"${line}"'/' \
     /etc/hosts \
-  || fail $err_sed_hosts "sed failed:  ${?}"
-  /usr/sbin/service dnsmasq force-reload \
-  || fail $err_service_reload "service reload failed:  ${?}"
+    || fail $err_sed_hosts "sed failed (domain):  ${?}"
 fi
 
-line="${external_ip}"' {{ groups['dmz'][0] }}.{{ domain }}'
-if ! grep -qF "^${line}$" /etc/hosts; then
+
+# fix DMZ
+if ! grep -qF ' {{ groups['dmz'][0] }}.{{ domain }}' /etc/hosts; then
+  reload='yes'
+  echo ' {{ groups['dmz'][0] }}.{{ domain }}' >> /etc/hosts \
+  || fail $err_append 'Failed to append a line the DMZ to /etc/hosts.'
+fi
+
+line="$(
+  sed 's/\./\\./g' <<< "${external_ip}"' {{ groups['dmz'][0] }}.{{ domain }}' 
+)"
+if ! grep -q "^${line}" /etc/hosts; then
+  reload='yes'
   pattern="$(
     sed 's/\./\\./g' <<< ' {{ groups['dmz'][0] }}.{{ domain }}'
   )"
   sed -i -E \
     's/.*'"${pattern}"'.*$/'"${line}"'/' \
     /etc/hosts \
-  || fail $err_sed_hosts "sed failed:  ${?}"
-  /usr/sbin/service dnsmasq force-reload \
-  || fail $err_service_reload "service reload failed:  ${?}"
+  || fail $err_sed_hosts "sed failed (DMZ):  ${?}"
 fi
 
-{% for h in groups['remote'] %}
-line="{{ hostvars[h]['ip_address'] }}"' remote.{{ domain }}'
-if ! grep -qF "^${line}$" /etc/hosts; then
+
+# fix remote
+if ! grep -qF ' remote.{{ domain }}' /etc/hosts; then
+  reload='yes'
+  echo ' remote.{{ domain }}' >> /etc/hosts \
+  || fail $err_append 'Failed to append a line for remote to /etc/hosts.'
+fi
+
+line="$(
+  sed 's/\./\\./g' <<< "{{ hostvars[groups['remote'][0]]['ip_address'] }}"' remote.{{ domain }}'
+)"
+if ! grep -q "^${line}" /etc/hosts; then
+  reload='yes'
   pattern="$(
     sed 's/\./\\./g' <<< ' remote.{{ domain }}'
   )"
   sed -i -E \
     's/.*'"${pattern}"'.*$/'"${line}"'/' \
     /etc/hosts \
-  || fail $err_sed_hosts "sed failed:  ${?}"
+  || fail $err_sed_hosts "sed failed (remote):  ${?}"
+fi
+
+
+# reload
+if test 'yes' = "${reload}"; then
   /usr/sbin/service dnsmasq force-reload \
   || fail $err_service_reload "service reload failed:  ${?}"
 fi
-{% endfor %}
