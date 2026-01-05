@@ -4,11 +4,6 @@ install_packages:
   - 'dnsmasq'
 # https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=860064
 install_files:
-  # Just don't install a hosts file.  There's no static list of hostnames to
-  # install, and the file should be updated automatically within about ten
-  # minutes, if that's even necessary.  If we're feeling fancy later, we can
-  # try to make update_dns_phase1 run on synapse in order to ensure the file
-  # is initialized.
   - owner:              'root'
     group:              'root'
     mode:               '0644'
@@ -35,6 +30,15 @@ template_files:
     mode:               '0644'
     src:                'templates/conf/dnsmasq.conf.j2'
     dest:               '/etc/dnsmasq.conf'
+  - owner:              'root'
+    group:              'root'
+    mode:               '0755'
+    src:                'templates/dhclient-exit-hooks.d/update-dns.j2'
+    dest:               '/etc/dhcp/dhclient-exit-hooks.d/update-dns'
+# It would be good to immediately update /etc/hosts with all current names and
+# aliases for host and domain.  A shell command could potentially be added to
+# run the hook script, here, but that would require providing the variables
+# normally set by dhclient.
 create_files:
   - owner:              'neuronpointer'
     group:              'root'
@@ -56,8 +60,3 @@ start_services:
   - 'dnsmasq'
 restart_services:
   - 'dnsmasq'
-#commands:
-#  - command:            /usr/local/bin/dns_root_agent
-#    user:               root
-#    chdir:              /
-#    creates:            /nothing

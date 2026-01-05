@@ -1,0 +1,29 @@
+#!/bin/bash  
+
+# dhclient sets some environmental variables used below.
+if test "${reason}" != 'BOUND' && test "${reason}" != 'RENEW'; then
+  # An address has not been acquired.  Do nothing.
+  exit 0
+fi
+ 
+if test '' = "${new_ip_address}"; then
+  exit 1
+fi
+ 
+hostname="{{ inventory_hostname }}"
+if test '' = "${hostname}"; then
+  exit 1
+fi
+ 
+
+{# Maybe this would be simpler if join() were used on host_aliases and hostname and on domain_aliases and domain. #}
+line="$(printf '%-15s %s' "${new_ip_address}" "${hostname} ${hostname}.{{ domain }}{% for host_alias in hostvars[inventory_hostname]['aliases']|default([]) %} {{ host_alias }} {{ host_alias }}.{{ domain }}{% endfor %}{% for domain_alias in domain_aliases|default([]) %} ${hostname}.{{ domain_alias }}{% for host_alias in hostvars[inventory_hostname]['aliases']|default([]) %} {{ host_alias }} {{ host_alias }}.{{ domain_alias }}{% endfor %}{% endfor %}")"
+
+if grep -qE " ${hostname}( |\$)" /etc/hosts; then
+  # Do not combine "-i" and "-E" into "-iE".
+  sed -i -E "s/^.* ${hostname}(\$| .*\$)/${line}/" /etc/hosts; ret="${?}"
+else
+  printf '%s\n' "${line}" >> /etc/hosts; ret="${?}"
+fi
+
+exit "${ret}"
