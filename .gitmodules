@@ -1,0 +1,9 @@
+[submodule "tasks/common"]
+	path = tasks/common
+	url = git@github.com:abugher/ansible-common-tasks.git
+[submodule "inventory"]
+	path = inventory
+	url = git@github.com:abugher/ansible-inventory.git
+[submodule "environment"]
+	path = environment
+	url = git@github.com:abugher/ansible-environment.git
