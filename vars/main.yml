@@ -51,7 +51,7 @@ system_users:
   - 'neuronpointer'
 authorized_keys:
   - user:               'neuronpointer'
-    keyfile:            "inventory/hosts/{{ groups['dns-internal'][0] }}/users/updatedns/files/ssh_keys/id_rsa.pub"
+    keyfile:            "{{ inventory_path }}/hosts/{{ groups['dns-internal'][0] }}/users/updatedns/files/ssh_keys/id_rsa.pub"
 allow_users:
   - 'neuronpointer'
 enable_services:
